@@ -1,96 +1,188 @@
 // ===== FONCTIONS DE BASE =====
 document.addEventListener('DOMContentLoaded', function() {
-    // Animation d'entrée
-    animateElements();
+    // Initialisation des animations
+    initAnimations();
     
-    // Gestion du menu mobile
-    setupMobileMenu();
+    // Configuration du menu mobile
+    initMobileMenu();
     
-    // Fonctionnalité panier (exemple e-commerce)
-    setupCart();
+    // Initialisation du panier (exemple e-commerce)
+    initCartSystem();
     
-    // Gestion des formulaires
-    setupForms();
+    // Configuration des formulaires
+    initForms();
 });
 
 // ===== ANIMATIONS =====
-function animateElements() {
-    const observer = new IntersectionObserver((entries) => {
+function initAnimations() {
+    const animationObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('animate');
+                // Optionnel : on peut arrêter d'observer après l'animation
+                animationObserver.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1 });
+    }, { 
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px' // Détecte 50px avant l'élément
+    });
 
-    document.querySelectorAll('article, .btn').forEach(el => {
-        observer.observe(el);
+    // Éléments à animer
+    const animatableElements = document.querySelectorAll(
+        'article, .btn, .card-container, .protect-content p'
+    );
+    
+    animatableElements.forEach(el => {
+        animationObserver.observe(el);
     });
 }
 
 // ===== MENU MOBILE =====
-function setupMobileMenu() {
-    const menuBtn = document.createElement('button');
-    menuBtn.innerHTML = '☰';
-    menuBtn.className = 'mobile-menu-btn';
-    document.querySelector('nav').prepend(menuBtn);
+function initMobileMenu() {
+    const navElement = document.querySelector('nav');
+    if (!navElement) return;
+
+    const menuButton = document.createElement('button');
+    menuButton.innerHTML = '☰';
+    menuButton.className = 'mobile-menu-btn';
+    menuButton.setAttribute('aria-label', 'Ouvrir le menu');
+    navElement.prepend(menuButton);
     
-    menuBtn.addEventListener('click', function() {
-        const nav = document.querySelector('nav ul');
-        nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+    const navList = document.querySelector('nav ul');
+    if (!navList) return;
+
+    // Gestion de l'état du menu
+    let isMenuOpen = false;
+    
+    menuButton.addEventListener('click', function() {
+        isMenuOpen = !isMenuOpen;
+        navList.style.display = isMenuOpen ? 'flex' : 'none';
+        menuButton.setAttribute('aria-expanded', isMenuOpen);
+    });
+
+    // Fermer le menu quand on clique à l'extérieur
+    document.addEventListener('click', function(e) {
+        if (isMenuOpen && !navElement.contains(e.target)) {
+            isMenuOpen = false;
+            navList.style.display = 'none';
+            menuButton.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // Adaptabilité au redimensionnement
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            navList.style.display = 'flex';
+        } else if (!isMenuOpen) {
+            navList.style.display = 'none';
+        }
     });
 }
 
-// ===== SYSTÈME DE PANIER (EXEMPLE E-COMMERCE) =====
-function setupCart() {
-    const cart = [];
-    const cartBtn = document.createElement('div');
-    cartBtn.innerHTML = `🛒 <span class="cart-count">0</span>`;
-    cartBtn.className = 'cart-btn';
-    document.body.appendChild(cartBtn);
-    
-    // Exemple d'ajout au panier
+// ===== SYSTÈME DE PANIER =====
+function initCartSystem() {
+    const cart = {
+        items: [],
+        addItem: function(product) {
+            this.items.push(product);
+            this.updateDisplay();
+            showNotification(`${product.name} ajouté au panier`);
+        },
+        updateDisplay: function() {
+            const countElement = document.querySelector('.cart-count');
+            if (countElement) {
+                countElement.textContent = this.items.length;
+            }
+        }
+    };
+
+    // Création du bouton panier
+    const cartButton = document.createElement('button');
+    cartButton.className = 'cart-btn';
+    cartButton.innerHTML = `🛒 <span class="cart-count">0</span>`;
+    cartButton.setAttribute('aria-label', 'Panier');
+    document.body.appendChild(cartButton);
+
+    // Écouteurs pour les boutons "Ajouter au panier"
     document.querySelectorAll('.add-to-cart').forEach(btn => {
         btn.addEventListener('click', function() {
-            const product = this.dataset.product;
-            cart.push(product);
-            updateCartCount();
-            showNotification(`${product} ajouté au panier`);
+            const productData = {
+                id: this.dataset.id,
+                name: this.dataset.name,
+                price: parseFloat(this.dataset.price)
+            };
+            cart.addItem(productData);
         });
     });
-    
-    function updateCartCount() {
-        document.querySelector('.cart-count').textContent = cart.length;
-    }
 }
 
 // ===== NOTIFICATIONS =====
-function showNotification(message) {
-    const notif = document.createElement('div');
-    notif.className = 'notification';
-    notif.textContent = message;
-    document.body.appendChild(notif);
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.setAttribute('role', 'alert');
+    notification.textContent = message;
+    document.body.appendChild(notification);
     
+    // Animation et suppression
     setTimeout(() => {
-        notif.classList.add('fade-out');
-        setTimeout(() => notif.remove(), 500);
+        notification.classList.add('fade-out');
+        notification.addEventListener('transitionend', () => {
+            notification.remove();
+        });
     }, 3000);
 }
 
-// ===== GESTION DES FORMULAIRES =====
-function setupForms() {
+// ===== FORMULAIRES =====
+function initForms() {
     const contactForm = document.getElementById('contact-form');
     if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
+        contactForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            // Ici vous ajouteriez le code pour envoyer les données
-            showNotification('Message envoyé avec succès !');
-            this.reset();
+            
+            // Validation basique
+            const nameInput = this.querySelector('input[name="name"]');
+            if (!nameInput.value.trim()) {
+                showNotification('Veuillez entrer votre nom', 'error');
+                return;
+            }
+
+            // Simulation d'envoi
+            try {
+                // Ici vous remplaceriez par un vrai fetch()
+                await simulateFormSubmit(this);
+                showNotification('Message envoyé avec succès !');
+                this.reset();
+            } catch (error) {
+                showNotification('Erreur lors de l\'envoi', 'error');
+                console.error(error);
+            }
         });
     }
 }
 
-// ===== FONCTIONNALITÉS AVANCÉES =====
-function initImageSlider() {
-    // Code pour un slider d'images (à ajouter si nécessaire)
+// Fonction simulée pour l'exemple
+function simulateFormSubmit(form) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            console.log('Formulaire soumis :', new FormData(form));
+            resolve();
+        }, 1000);
+    });
 }
+
+// ===== OPTIMISATIONS =====
+// Délai pour les événements de resize/scroll
+function debounce(func, wait = 100) {
+    let timeout;
+    return function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(func, wait);
+    };
+}
+
+// Usage pour le redimensionnement
+window.addEventListener('resize', debounce(function() {
+    console.log('Fenêtre redimensionnée');
+}));

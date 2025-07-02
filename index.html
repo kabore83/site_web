@@ -7,18 +7,27 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- En-tête du site -->
-    <header>
-        <h1>Business Informatique</h1>
-        <p>Votre partenaire technologique</p>
+    <!-- En-tête fixe -->
+    <header class="header-fixe">
+        <div class="header-content">
+            <h1>Business Informatique</h1>
+            <p>Votre partenaire technologique</p>
+        </div>
     </header>
 
+    <!-- Le reste de votre contenu -->
+    <main class="main-content">
+        <!-- Votre contenu ici -->
+    </main>
+</body>
+</html>
+<body>
     <!-- Navigation -->
     <nav>
         <ul>
-            <li><a href="#accueil">Accueil</a></li>
+            <li><a href="index.html">Accueil</a></li>
             <li><a href="#services">Services</a></li>
-            <li><a href="#produits">Produits</a></li>
+            <li><a href="protect.html">Notre Partenaire</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
     </nav>
@@ -28,7 +37,7 @@
         <section id="accueil">
             <h2>Bienvenue chez Business Informatique</h2>
             <p>Nous proposons des solutions informatiques complètes pour les professionnels et particuliers.</p>
-            <a href="#services" class="btn">Découvrez nos services</a>
+            <a href="protect.html" class="btn">Découvrez notre partenaire Protect</a>
         </section>
 
         <section id="services">
@@ -42,13 +51,63 @@
                     <h3>Maintenance</h3>
                     <p>Support technique et dépannage informatique.</p>
                 </article>
+                <article>
+                    <h3>Sécurité informatique</h3>
+                    <p>Surveillance des systèmes informatiques.</p>
+                </article>
             </div>
         </section>
     </main>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notre Partenaire Protect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="index.html"><i class="fas fa-home"></i> Présentation du site et services</a></li>
+        </ul>
+    </nav>
 
+    <!-- Contenu principal -->
+    <main class="container">
+        <div class="card-container">
+            <div class="card-header">
+                <h2><i class="fas fa-handshake"></i> NOTRE PARTENAIRE STRATÉGIQUE</h2>
+            </div>
+            
+            <div class="card-body">
+                <img src="assets/images/image.png" alt="Partenaire Protect - Solutions informatiques" class="protect-image">
+                
+                <div class="protect-content">
+                    <h3><i class="fas fa-shield-alt"></i> PROTECTION NUMÉRIQUE & ÉQUIPEMENTS INFORMATIQUES</h3>
+                    
+                    <p>
+                        <i class="fas fa-mobile-alt"></i> 
+                        <strong>Disponible 24/7</strong> sur tous appareils Android et via Internet, BUSINESS_COMPUTER spécialiste en équipements informatiques, support technique et solutions de cybersécurité haute performance.
+                    </p>
+                    
+                    <p>
+                        <i class="fas fa-users"></i> 
+                        <strong>+1000 clients satisfaits</strong> - Étudiants, professionnels et entreprises bénéficient de nos technologies de pointe et de notre expertise en matériel électronique et communication.
+                    </p>
+                    
+                    <a href="index.html" class="btn-return">
+                        <i class="fas fa-arrow-left"></i> Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
     <!-- Pied de page -->
     <footer>
         <p>&copy; 2023 Business Informatique. Tous droits réservés.</p>
     </footer>
 </body>
-</html>
+</html>ss
